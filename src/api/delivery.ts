@@ -44,4 +44,12 @@ export const deliveryApi = {
     deleteConfig: async (configId: string): Promise<void> => {
         await apiClient.delete(`/v1/delivery-configs/${configId}`);
     },
+
+    calculateFee: async (payload: DeliveryFeeRequest): Promise<{ fee: number; distance: number }> => {
+        const response = await apiClient.post<DeliveryFeeResponse>(
+            '/v1/delivery-configs/calculate-fee',
+            payload
+        );
+        return response.data.data;
+    },
 };

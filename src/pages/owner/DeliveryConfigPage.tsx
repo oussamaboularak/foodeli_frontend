@@ -5,7 +5,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Truck, Plus, X, Edit, Check, Calculator, Trash2, MapPin, Settings2, ArrowRight, Info } from 'lucide-react';
+import { Truck, Plus, X, Edit, Calculator, Trash2, MapPin, Info } from 'lucide-react';
 import { restaurantsApi } from '@/api/restaurants';
 import type { Restaurant } from '@/types/restaurant';
 
@@ -21,6 +21,7 @@ const DeliveryConfigPage: React.FC = () => {
         description: '',
         baseFee: '',
         perKmRate: '',
+        tax: '',
         isActive: true,
     });
 
@@ -51,6 +52,7 @@ const DeliveryConfigPage: React.FC = () => {
             description: config.description || '',
             baseFee: config.baseFee.toString(),
             perKmRate: config.perKmRate.toString(),
+            tax: (config.tax || 0).toString(),
             isActive: config.isActive,
         });
         setShowForm(true);
@@ -59,7 +61,7 @@ const DeliveryConfigPage: React.FC = () => {
     const handleCancel = () => {
         setShowForm(false);
         setEditingConfig(null);
-        setFormData({ name: '', description: '', baseFee: '', perKmRate: '', isActive: true });
+        setFormData({ name: '', description: '', baseFee: '', perKmRate: '', tax: '', isActive: true });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -70,6 +72,7 @@ const DeliveryConfigPage: React.FC = () => {
                 description: formData.description,
                 baseFee: parseFloat(formData.baseFee),
                 perKmRate: parseFloat(formData.perKmRate),
+                tax: parseFloat(formData.tax) || 0,
                 isActive: formData.isActive,
             };
 
@@ -104,7 +107,7 @@ const DeliveryConfigPage: React.FC = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-3xl font-black text-gray-900 tracking-tight">Delivery Logistics</h2>
-                        <p className="text-gray-500 mt-1">Manage pricing zones and fee calculation rules</p>
+                        <p className="text-gray-500 mt-1">Manage pricing rules, taxes and kilometrage rates</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <Button
@@ -118,7 +121,7 @@ const DeliveryConfigPage: React.FC = () => {
                             onClick={() => setShowForm(true)}
                             className="h-12 px-6 bg-gray-900 hover:bg-orange-600 text-white shadow-xl shadow-gray-200 transition-all font-bold rounded-xl"
                         >
-                            <Plus className="h-5 w-5 mr-2" /> Add Zone
+                            <Plus className="h-5 w-5 mr-2" /> Add Rule
                         </Button>
                     </div>
                 </div>
@@ -132,73 +135,73 @@ const DeliveryConfigPage: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Configurations List */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {loading ? (
-                        <div className="col-span-full py-20 text-center text-gray-400 italic">Updating fleet configurations...</div>
-                    ) : configs.length === 0 ? (
-                        <Card className="col-span-full border-dashed border-2 border-gray-200 bg-gray-50/50">
-                            <CardContent className="py-20 text-center">
+                {/* Configurations Table */}
+                <Card className="border-none shadow-sm overflow-hidden bg-white rounded-3xl">
+                    <CardContent className="p-0">
+                        {loading ? (
+                            <div className="py-20 text-center text-gray-400 italic">Updating logistics data...</div>
+                        ) : configs.length === 0 ? (
+                            <div className="py-20 text-center bg-gray-50/50">
                                 <Truck className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                                <p className="text-gray-500 font-medium">No delivery zones configured yet</p>
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        configs.map((config) => (
-                            <Card key={config.id} className={`border-none shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden bg-white rounded-3xl ${config.isActive ? 'ring-2 ring-orange-500 ring-offset-4' : ''}`}>
-                                <CardContent className="p-0">
-                                    <div className={`h-1.5 w-full ${config.isActive ? 'bg-orange-500' : 'bg-gray-100'}`} />
-                                    <div className="p-6">
-                                        <div className="flex items-start justify-between mb-6">
-                                            <div className="flex items-center gap-4">
-                                                <div className={`p-4 rounded-2xl ${config.isActive ? 'bg-orange-50 text-orange-600' : 'bg-gray-50 text-gray-400'}`}>
-                                                    <Truck className="h-6 w-6" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-xl font-bold text-gray-900">{config.name}</h3>
-                                                    <p className="text-sm text-gray-500 tracking-tight">{config.description || 'Global pricing rules'}</p>
-                                                </div>
-                                            </div>
-                                            {config.isActive && (
-                                                <div className="bg-orange-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg shadow-orange-100">
-                                                    Active Zone
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-4 mb-6">
-                                            <div className="p-4 bg-gray-50 rounded-2xl">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Base Fee</span>
-                                                <span className="text-2xl font-black text-gray-900">{config.baseFee.toFixed(2)}<small className="text-xs ml-1 opacity-50">DZD</small></span>
-                                            </div>
-                                            <div className="p-4 bg-gray-50 rounded-2xl">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Per KM</span>
-                                                <span className="text-2xl font-black text-gray-900">{config.perKmRate.toFixed(2)}<small className="text-xs ml-1 opacity-50">DZD</small></span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <Button
-                                                variant="outline"
-                                                className="flex-1 h-11 bg-white border-gray-100 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-100 rounded-xl transition-all"
-                                                onClick={() => handleEdit(config)}
-                                            >
-                                                <Settings2 className="h-4 w-4 mr-2" /> Modify Rules
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                className="w-11 h-11 p-0 bg-white border-gray-100 hover:bg-red-50 hover:text-red-500 hover:border-red-100 rounded-xl transition-all"
-                                                onClick={() => handleDelete(config.id)}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))
-                    )}
-                </div>
+                                <p className="text-gray-500 font-medium">No delivery rules configured yet</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-50/50 border-b border-gray-100">
+                                            <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Name</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Description</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Base Fee</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Tax (DZD)</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Price per KM</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Status</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {configs.map((config) => (
+                                            <tr key={config.id} className={`group hover:bg-gray-50/50 transition-colors ${config.isActive ? 'bg-orange-50/20' : ''}`}>
+                                                <td className="px-6 py-4 font-bold text-gray-900">{config.name}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">{config.description || '-'}</td>
+                                                <td className="px-6 py-4 text-right font-black text-gray-900">{config.baseFee.toFixed(2)} DZD</td>
+                                                <td className="px-6 py-4 text-right font-black text-gray-900">{(config.tax || 0).toFixed(2)} DZD</td>
+                                                <td className="px-6 py-4 text-right font-black text-gray-900 text-orange-600">{config.perKmRate.toFixed(2)} DZD</td>
+                                                <td className="px-6 py-4 text-center">
+                                                    {config.isActive ? (
+                                                        <span className="px-3 py-1 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full">Active</span>
+                                                    ) : (
+                                                        <span className="px-3 py-1 bg-gray-200 text-gray-500 text-[10px] font-black uppercase tracking-widest rounded-full">Inactive</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-9 w-9 p-0 bg-white border-gray-100 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-100 rounded-xl transition-all"
+                                                            onClick={() => handleEdit(config)}
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-9 w-9 p-0 bg-white border-gray-100 hover:bg-red-50 hover:text-red-500 hover:border-red-100 rounded-xl transition-all"
+                                                            onClick={() => handleDelete(config.id)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
 
             {/* Modal Form */}
@@ -207,23 +210,27 @@ const DeliveryConfigPage: React.FC = () => {
                     <Card className="w-full max-w-lg shadow-2xl border-none animate-in fade-in zoom-in-95 duration-200 bg-white scale-100 rounded-3xl overflow-hidden">
                         <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">{editingConfig ? 'Update Zone' : 'New Pricing Zone'}</h3>
-                                <p className="text-xs text-gray-500 font-medium mt-1">Configure automated fee calculations</p>
+                                <h3 className="text-xl font-bold text-gray-900">{editingConfig ? 'Update Rule' : 'New Delivery Rule'}</h3>
+                                <p className="text-xs text-gray-500 font-medium mt-1">Configure automated fee and tax calculations</p>
                             </div>
                             <button onClick={handleCancel} className="p-2 hover:bg-white rounded-xl transition-colors shadow-sm"><X className="h-5 w-5 text-gray-500" /></button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-8 space-y-5">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Zone Identification</label>
-                                <Input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Casablanca Metropolitan" className="h-12 bg-gray-50/50 border-gray-100 rounded-xl" />
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rule Name</label>
+                                <Input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Standard Logistics" className="h-12 bg-gray-50/50 border-gray-100 rounded-xl" />
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Base Fee (DZD)</label>
                                     <Input required type="number" step="0.01" value={formData.baseFee} onChange={e => setFormData({ ...formData, baseFee: e.target.value })} placeholder="0.00" className="h-12 bg-gray-50/50 border-gray-100 rounded-xl" />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Per KM Rate</label>
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tax (DZD)</label>
+                                    <Input required type="number" step="0.01" value={formData.tax} onChange={e => setFormData({ ...formData, tax: e.target.value })} placeholder="0.00" className="h-12 bg-gray-50/50 border-gray-100 rounded-xl" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Price per KM</label>
                                     <Input required type="number" step="0.01" value={formData.perKmRate} onChange={e => setFormData({ ...formData, perKmRate: e.target.value })} placeholder="0.00" className="h-12 bg-gray-50/50 border-gray-100 rounded-xl" />
                                 </div>
                             </div>
@@ -234,13 +241,13 @@ const DeliveryConfigPage: React.FC = () => {
                                         <div className={`w-12 h-6 rounded-full transition-colors ${formData.isActive ? 'bg-orange-500' : 'bg-gray-200'}`}></div>
                                         <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${formData.isActive ? 'translate-x-6' : 'translate-x-0'}`}></div>
                                     </div>
-                                    <span className="text-sm font-bold text-gray-700 group-hover:text-orange-500 transition-colors">Set as the Default Active Zone</span>
+                                    <span className="text-sm font-bold text-gray-700 group-hover:text-orange-500 transition-colors">Set as the Default Active Rule</span>
                                 </label>
                             </div>
                             <div className="flex gap-4 pt-6">
                                 <Button type="button" variant="ghost" onClick={handleCancel} className="flex-1 h-12 font-bold text-gray-500 rounded-xl">Discard</Button>
                                 <Button type="submit" className="flex-1 h-12 bg-gray-900 hover:bg-orange-600 text-white font-bold transition-all rounded-xl shadow-lg shadow-gray-200">
-                                    {editingConfig ? 'Save Rule' : 'Initialize Zone'}
+                                    {editingConfig ? 'Save Rule' : 'Initialize Rule'}
                                 </Button>
                             </div>
                         </form>

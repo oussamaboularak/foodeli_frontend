@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { authApi } from '@/api/auth';
 import { usersApi } from '@/api/users';
 import { jwtDecode } from "jwt-decode";
+import { cookieUtils } from '@/utils/cookies';
 import type { User, AuthState } from '@/types/auth';
 
 interface AuthContextType extends AuthState {
@@ -67,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('token');
+      const token = cookieUtils.getToken();
       if (token) {
         try {
           const decoded = jwtDecode<JWTPayload>(token);
@@ -80,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           dispatch({ type: 'LOGIN_SUCCESS', payload: { user: typedUser } });
         } catch (error) {
           console.error("Auth initialization failed:", error);
-          localStorage.removeItem('token');
+          cookieUtils.removeToken();
           dispatch({ type: 'SET_LOADING', payload: false });
         }
       } else {
@@ -95,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await authApi.login({ phone, password });
       const accessToken = response.accessToken;
-      localStorage.setItem('token', accessToken);
+      cookieUtils.setToken(accessToken);
 
       const decoded = jwtDecode<JWTPayload>(accessToken);
       const user = await usersApi.getById(decoded.userId);
@@ -113,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     authApi.logout().catch(console.error);
-    localStorage.removeItem('token');
+    cookieUtils.removeToken();
     dispatch({ type: 'LOGOUT' });
   };
 

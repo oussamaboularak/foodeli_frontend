@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { cookieUtils } from '@/utils/cookies';
 
 // Use relative URL to go through Vite proxy (configured in vite.config.ts)
 const API_BASE_URL = '';
@@ -14,9 +15,13 @@ export const apiClient = axios.create({
 // Request interceptor to add the auth token to headers
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = cookieUtils.getToken();
+    console.log('[API Client] Token from cookie:', token ? 'EXISTS' : 'MISSING');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('[API Client] Authorization header set');
+    } else {
+      console.warn('[API Client] No token found in cookies');
     }
     return config;
   },
@@ -77,7 +82,7 @@ apiClient.interceptors.response.use(
 
         const { accessToken } = response.data;
 
-        localStorage.setItem('token', accessToken);
+        cookieUtils.setToken(accessToken);
 
         apiClient.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken;
         originalRequest.headers['Authorization'] = 'Bearer ' + accessToken;
@@ -91,7 +96,7 @@ apiClient.interceptors.response.use(
         processQueue(err, null);
         isRefreshing = false;
         // Clear tokens and redirect to login
-        localStorage.removeItem('token');
+        cookieUtils.removeToken();
         window.location.href = '/login';
         return Promise.reject(err);
       }

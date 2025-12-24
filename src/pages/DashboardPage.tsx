@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import DashboardLayout from '@/components/DashboardLayout';
-import { Store, Users, DollarSign, ArrowUpRight, ShoppingBag } from 'lucide-react';
+import { Store, Users, DollarSign, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ordersApi } from '@/api/orders';
 import { usersApi } from '@/api/users';
@@ -77,8 +77,8 @@ const DashboardPage: React.FC = () => {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-          <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h2>
+          <p className="text-sm sm:text-base text-gray-500">Welcome back! Here's what's happening today.</p>
         </div>
 
         {/* Stats Grid */}
@@ -101,11 +101,11 @@ const DashboardPage: React.FC = () => {
 
 const StatCard = ({ title, value }: { title: string; value: string }) => (
   <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
-    <CardContent className="p-6">
+    <CardContent className="p-4 sm:p-6">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <h3 className="text-3xl font-bold text-gray-900 mt-2">{value}</h3>
+          <p className="text-xs sm:text-sm font-medium text-gray-500">{title}</p>
+          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1 sm:mt-2">{value}</h3>
         </div>
       </div>
 
@@ -115,31 +115,31 @@ const StatCard = ({ title, value }: { title: string; value: string }) => (
 
 const RecentOrdersCard = ({ loading, orders, onViewAll }: any) => (
   <Card className="border-none shadow-sm">
-    <div className="p-6 flex items-center justify-between border-b border-gray-100">
-      <h3 className="font-bold text-gray-900 text-lg">Recent Orders</h3>
-      <Button variant="ghost" className="text-orange-500 hover:bg-orange-50" onClick={onViewAll}>View all</Button>
+    <div className="p-4 sm:p-6 flex items-center justify-between border-b border-gray-100">
+      <h3 className="font-bold text-gray-900 text-base sm:text-lg">Recent Orders</h3>
+      <Button variant="ghost" size="sm" className="text-orange-500 hover:bg-orange-50 text-xs sm:text-sm" onClick={onViewAll}>View all</Button>
     </div>
     <CardContent className="p-0">
       <div className="divide-y divide-gray-50">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading orders...</div>
+          <div className="p-6 sm:p-8 text-center text-gray-500 text-sm">Loading orders...</div>
         ) : orders.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No orders yet.</div>
+          <div className="p-6 sm:p-8 text-center text-gray-500 text-sm">No orders yet.</div>
         ) : (
           orders.map((order: any) => (
-            <div key={order.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-sm">
+            <div key={order.id} className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 hover:bg-gray-50 transition-colors cursor-pointer">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xs sm:text-sm flex-shrink-0">
                   {order.clientFirstName?.[0] || 'U'}
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-900">{order.clientFirstName} {order.clientLastName}</p>
-                  <p className="text-sm text-gray-500">{order.restaurantName}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">{order.clientFirstName} {order.clientLastName}</p>
+                  <p className="text-xs sm:text-sm text-gray-500 truncate">{order.restaurantName}</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="font-bold text-gray-900">DZD {(order.total || 0).toFixed(2)}</p>
-                <div className="flex items-center gap-2 mt-1 justify-end">
+              <div className="flex items-center justify-between sm:text-right sm:block pl-11 sm:pl-0">
+                <p className="font-bold text-gray-900 text-sm sm:text-base">DZD {(order.total || 0).toFixed(2)}</p>
+                <div className="flex items-center gap-2 mt-0 sm:mt-1 sm:justify-end">
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor(order.status)}`}>
                     {order.status}
                   </span>
@@ -158,29 +158,29 @@ const RecentOrdersCard = ({ loading, orders, onViewAll }: any) => (
 
 const TopRestaurantsCard = ({ loading, restaurants, onViewAll }: any) => (
   <Card className="border-none shadow-sm">
-    <div className="p-6 flex items-center justify-between border-b border-gray-100">
-      <h3 className="font-bold text-gray-900 text-lg">Top Restaurants</h3>
-      <Button variant="ghost" className="text-orange-500 hover:bg-orange-50" onClick={onViewAll}>View all</Button>
+    <div className="p-4 sm:p-6 flex items-center justify-between border-b border-gray-100">
+      <h3 className="font-bold text-gray-900 text-base sm:text-lg">Top Restaurants</h3>
+      <Button variant="ghost" size="sm" className="text-orange-500 hover:bg-orange-50 text-xs sm:text-sm" onClick={onViewAll}>View all</Button>
     </div>
     <CardContent className="p-0">
       <div className="divide-y divide-gray-50">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading restaurants...</div>
+          <div className="p-6 sm:p-8 text-center text-gray-500 text-sm">Loading restaurants...</div>
         ) : restaurants.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No restaurants yet.</div>
+          <div className="p-6 sm:p-8 text-center text-gray-500 text-sm">No restaurants yet.</div>
         ) : (
           restaurants.map((r: any) => (
-            <div key={r.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="w-8 h-8 flex items-center justify-center font-bold text-gray-400 bg-gray-50 rounded-lg text-xs">{r.rank}</div>
-                <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600"><Store className="h-5 w-5" /></div>
-                <div>
-                  <p className="font-semibold text-gray-900">{r.name}</p>
-                  <p className="text-sm text-gray-500">{r.orders} orders</p>
+            <div key={r.id} className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 hover:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center font-bold text-gray-400 bg-gray-50 rounded-lg text-xs flex-shrink-0">{r.rank}</div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600 flex-shrink-0"><Store className="h-4 w-4 sm:h-5 sm:w-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">{r.name}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">{r.orders} orders</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="font-bold text-gray-900">DZD {r.revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+              <div className="sm:text-right pl-14 sm:pl-0">
+                <p className="font-bold text-gray-900 text-sm sm:text-base">DZD {r.revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                 <p className="text-xs text-gray-400">revenue</p>
               </div>
             </div>

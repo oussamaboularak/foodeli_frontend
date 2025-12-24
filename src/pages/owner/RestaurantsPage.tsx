@@ -233,12 +233,12 @@ const RestaurantsPage: React.FC = () => {
                     </Card>
                 )}
 
-                {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Vertical List */}
+                <div className="space-y-4">
                     {loading ? (
-                        <div className="col-span-full py-12 text-center text-gray-500">Loading restaurants...</div>
+                        <div className="py-12 text-center text-gray-500">Loading restaurants...</div>
                     ) : filteredRestaurants.length === 0 ? (
-                        <div className="col-span-full py-12 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                        <div className="py-12 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
                             <Store className="h-10 w-10 text-gray-300 mx-auto mb-3" />
                             <p className="text-gray-500 font-medium">No restaurants found</p>
                         </div>
@@ -246,59 +246,70 @@ const RestaurantsPage: React.FC = () => {
                         filteredRestaurants.map((restaurant) => (
                             <Card
                                 key={restaurant.id}
-                                className="group overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer bg-white"
+                                className="group overflow-hidden border-none shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer bg-white"
                                 onClick={() => navigate(`/restaurants/${restaurant.id}`)}
                             >
-                                <div className="relative h-48 bg-gray-100 overflow-hidden">
-                                    {restaurant.coverUrl ? (
-                                        <img
-                                            src={restaurant.coverUrl}
-                                            alt={restaurant.name}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-orange-50 text-orange-200">
-                                            <Store className="h-16 w-16" />
-                                        </div>
-                                    )}
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                                <div className="flex flex-col md:flex-row">
+                                    {/* Image Section */}
+                                    <div className="relative md:w-64 h-48 md:h-auto bg-gray-100 overflow-hidden flex-shrink-0">
+                                        {restaurant.coverUrl ? (
+                                            <img
+                                                src={restaurant.coverUrl}
+                                                alt={restaurant.name}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-orange-50 text-orange-200">
+                                                <Store className="h-16 w-16" />
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                                    </div>
 
-                                    {/* Quick Actions */}
-                                    <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 transform translate-y-2 group-hover:translate-y-0">
-                                        <button
-                                            onClick={(e) => handleEdit(restaurant, e)}
-                                            className="p-2 bg-white/90 hover:bg-white text-gray-700 hover:text-orange-600 rounded-full shadow-sm backdrop-blur-sm transition-colors"
-                                        >
-                                            <Edit className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => handleDelete(restaurant.id, e)}
-                                            className="p-2 bg-white/90 hover:bg-white text-gray-700 hover:text-red-600 rounded-full shadow-sm backdrop-blur-sm transition-colors"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
+                                    {/* Content Section */}
+                                    <div className="flex-1 p-6">
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="flex-1">
+                                                <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors mb-2">
+                                                    {restaurant.name}
+                                                </h3>
+                                                <p className="text-sm text-gray-500 line-clamp-2 mb-4">
+                                                    {restaurant.description}
+                                                </p>
+                                            </div>
+
+                                            {/* Quick Actions */}
+                                            <div className="flex gap-2 ml-4">
+                                                <button
+                                                    onClick={(e) => handleEdit(restaurant, e)}
+                                                    className="p-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 rounded-lg transition-colors"
+                                                >
+                                                    <Edit className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => handleDelete(restaurant.id, e)}
+                                                    className="p-2 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg transition-colors"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Details */}
+                                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                                            <div className="flex items-center gap-2">
+                                                <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                                                <span className="truncate">
+                                                    {restaurant.location.coordinates[1].toFixed(4)}, {restaurant.location.coordinates[0].toFixed(4)}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Phone className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                                                <span>{restaurant.phone}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <CardContent className="p-5">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h3 className="font-bold text-lg text-gray-900 line-clamp-1 group-hover:text-orange-600 transition-colors">
-                                            {restaurant.name}
-                                        </h3>
-                                    </div>
-                                    <p className="text-sm text-gray-500 line-clamp-2 mb-4 h-10">
-                                        {restaurant.description}
-                                    </p>
-                                    <div className="flex flex-col gap-2 text-sm text-gray-400">
-                                        <div className="flex items-center gap-2">
-                                            <MapPin className="h-4 w-4 text-orange-400" />
-                                            <span className="truncate">{restaurant.location.coordinates[1].toFixed(4)}, {restaurant.location.coordinates[0].toFixed(4)}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Phone className="h-4 w-4 text-orange-400" />
-                                            <span>{restaurant.phone}</span>
-                                        </div>
-                                    </div>
-                                </CardContent>
                             </Card>
                         ))
                     )}

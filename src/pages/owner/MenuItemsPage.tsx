@@ -4,11 +4,10 @@ import { restaurantsApi } from '@/api/restaurants';
 import { menuApi } from '@/api/menu';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import DashboardLayout from '@/components/DashboardLayout';
 import type { Restaurant } from '@/types/restaurant';
 import type { MenuItem } from '@/types/menu';
-import { ArrowLeft, Plus, UtensilsCrossed, Tag, Edit, Trash2, Settings, Search, Filter, Image as ImageIcon, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, UtensilsCrossed, Tag, Edit, Trash2, Settings, Search, Image as ImageIcon, ChevronRight } from 'lucide-react';
 
 const MenuItemsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -155,48 +154,82 @@ const MenuItemsPage: React.FC = () => {
                                 <span className="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1 rounded-full">{items.length} items</span>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="space-y-4">
                                 {items.map((item) => (
-                                    <Card key={item.id} className="border-none shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden bg-white rounded-3xl">
-                                        <div className="relative h-56 w-full overflow-hidden bg-gray-50">
-                                            {item.image_url ? (
-                                                <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                            ) : (
-                                                <div className="w-full h-full flex flex-col items-center justify-center text-gray-200">
-                                                    <ImageIcon className="h-12 w-12 mb-2" />
-                                                    <span className="text-xs font-bold uppercase tracking-widest opacity-50">No Image</span>
+                                    <Card key={item.id} className="border-none shadow-sm hover:shadow-lg transition-all duration-300 group overflow-hidden bg-white rounded-2xl">
+                                        <div className="flex flex-col md:flex-row">
+                                            {/* Image Section */}
+                                            <div className="relative md:w-72 h-56 md:h-auto overflow-hidden bg-gray-50 flex-shrink-0">
+                                                {item.image_url ? (
+                                                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                ) : (
+                                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-200">
+                                                        <ImageIcon className="h-12 w-12 mb-2" />
+                                                        <span className="text-xs font-bold uppercase tracking-widest opacity-50">No Image</span>
+                                                    </div>
+                                                )}
+                                                <div className="absolute top-4 left-4">
+                                                    <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm ${item.is_active ? 'bg-emerald-500 text-white' : 'bg-gray-400 text-white'}`}>
+                                                        {item.is_active ? 'Active' : 'Private'}
+                                                    </span>
                                                 </div>
-                                            )}
-                                            <div className="absolute top-4 right-4 flex gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 z-10">
-                                                <button onClick={() => navigate(`/restaurants/${id}/menu-options/${item.id}`)} className="p-2.5 bg-white/90 backdrop-blur shadow-lg rounded-xl text-gray-700 hover:text-orange-500 transition-colors" title="Settings">
-                                                    <Settings className="h-4 w-4" />
-                                                </button>
-                                                <button onClick={() => navigate(`/restaurants/${id}/edit-item/${item.id}`)} className="p-2.5 bg-white/90 backdrop-blur shadow-lg rounded-xl text-orange-600 hover:bg-orange-600 hover:text-white transition-all transform hover:scale-105" title="Edit">
-                                                    <Edit className="h-4 w-4" />
-                                                </button>
-                                                <button onClick={() => handleDelete(item.id)} className="p-2.5 bg-red-500 shadow-lg rounded-xl text-white hover:bg-red-600 transition-all transform hover:scale-105" title="Delete">
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
                                             </div>
-                                            <div className="absolute top-4 left-4">
-                                                <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm ${item.is_active ? 'bg-emerald-500 text-white' : 'bg-gray-400 text-white'}`}>
-                                                    {item.is_active ? 'Active' : 'Private'}
-                                                </span>
+
+                                            {/* Content Section */}
+                                            <div className="flex-1 p-6">
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-3 mb-2">
+                                                            <h5 className="text-xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
+                                                                {item.name}
+                                                            </h5>
+                                                            <span className="text-xl font-black text-orange-600 shrink-0">
+                                                                {item.price.toFixed(2)}<small className="text-xs ml-1">DZD</small>
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-sm text-gray-500 mb-4">
+                                                            {item.description || "No description provided for this delicious item."}
+                                                        </p>
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-full">
+                                                                {item.category}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => navigate(`/restaurants/${id}/menu-options/${item.id}`)}
+                                                                className="text-xs font-bold text-orange-500 flex items-center gap-1 hover:underline"
+                                                            >
+                                                                Manage Options <ChevronRight className="h-3 w-3" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Actions */}
+                                                    <div className="flex gap-2 ml-4">
+                                                        <button
+                                                            onClick={() => navigate(`/restaurants/${id}/menu-options/${item.id}`)}
+                                                            className="p-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 rounded-lg transition-colors"
+                                                            title="Settings"
+                                                        >
+                                                            <Settings className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => navigate(`/restaurants/${id}/edit-item/${item.id}`)}
+                                                            className="p-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 rounded-lg transition-colors"
+                                                            title="Edit"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(item.id)}
+                                                            className="p-2 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg transition-colors"
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <CardContent className="p-6">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <h5 className="text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-1">{item.name}</h5>
-                                                <span className="text-lg font-black text-orange-600 shrink-0 ml-4">{item.price.toFixed(2)}<small className="text-[10px] ml-1">DZD</small></span>
-                                            </div>
-                                            <p className="text-sm text-gray-500 line-clamp-2 min-h-[40px] mb-4">{item.description || "No description provided for this delicious item."}</p>
-                                            <div className="pt-4 border-t border-gray-50 flex items-center justify-between">
-                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{item.category}</span>
-                                                <button onClick={() => navigate(`/restaurants/${id}/menu-options/${item.id}`)} className="text-xs font-bold text-orange-500 flex items-center gap-1 hover:underline">
-                                                    Manage Options <ChevronRight className="h-3 w-3" />
-                                                </button>
-                                            </div>
-                                        </CardContent>
                                     </Card>
                                 ))}
                             </div>

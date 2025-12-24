@@ -15,6 +15,7 @@ const DashboardLayout: React.FC<LayoutProps> = ({ children }) => {
     const location = useLocation();
     const { logout, user } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const navItems = [
         { path: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -103,11 +104,68 @@ const DashboardLayout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
             </aside>
 
+            {/* Mobile Menu Overlay */}
+            {isMobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+            )}
+
+            {/* Mobile Dropdown Menu */}
+            <div className={`
+                fixed top-16 left-0 right-0 bg-white z-50 md:hidden
+                transform transition-all duration-300 ease-in-out shadow-lg
+                ${isMobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}
+            `}>
+                <nav className="p-4 space-y-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
+                    {navItems.map((item) => {
+                        const Icon = item.icon;
+                        const active = isActive(item.path);
+                        return (
+                            <button
+                                key={item.path}
+                                onClick={() => {
+                                    navigate(item.path);
+                                    setIsMobileMenuOpen(false);
+                                }}
+                                className={`
+                                    w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+                                    ${active
+                                        ? 'bg-orange-500 text-white shadow-md'
+                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                    }
+                                `}
+                            >
+                                <Icon className={`h-5 w-5 ${active ? 'text-white' : 'text-gray-600'}`} />
+                                <span className="font-medium">{item.label}</span>
+                            </button>
+                        );
+                    })}
+
+                    {/* Mobile User Info */}
+                    <div className="pt-4 mt-4 border-t border-gray-200">
+                        <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-lg">
+                            <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-medium">
+                                {user?.firstName?.charAt(0) || 'A'}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                    {user?.firstName} {user?.lastName}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">Admin</p>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
             {/* Main Content Area */}
             <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
                 {/* Top Header */}
-                <header className="h-16 bg-white border-b border-gray-200 sticky top-0 z-40 px-6 flex items-center justify-between">
+                <header className="h-16 bg-white border-b border-gray-200 sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
+                        {/* Desktop Sidebar Toggle */}
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                             className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg hidden md:block"
@@ -115,7 +173,15 @@ const DashboardLayout: React.FC<LayoutProps> = ({ children }) => {
                             <Menu className="h-5 w-5" />
                         </button>
 
-                        {/* Mobile Menu Toggle (Visible only on small screens) */}
+                        {/* Mobile Menu Toggle */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg md:hidden"
+                        >
+                            <Menu className="h-5 w-5" />
+                        </button>
+
+                        {/* Mobile Logo */}
                         <div className="md:hidden flex items-center gap-2">
                             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white">
                                 <span className="font-bold">F</span>

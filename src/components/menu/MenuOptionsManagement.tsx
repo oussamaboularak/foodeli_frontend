@@ -3,8 +3,8 @@ import { menuApi } from '@/api/menu';
 import type { MenuItem, MenuOptionGroup, MenuOption, MenuOptionGroupFormData, MenuOptionFormData } from '@/types/menu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Plus, X, Trash2, Edit, Check, ChevronRight, Settings2 } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Plus, X, Trash2, Edit, Check, ChevronRight, Settings2, Info, ListTree, PackagePlus, MousePointerClick } from 'lucide-react';
 
 interface MenuOptionsManagementProps {
     menuItem: MenuItem;
@@ -90,7 +90,6 @@ export const MenuOptionsManagement: React.FC<MenuOptionsManagementProps> = ({ me
             loadGroups();
         } catch (error) {
             console.error('Failed to save group:', error);
-            alert('Failed to save option group');
         }
     };
 
@@ -115,7 +114,6 @@ export const MenuOptionsManagement: React.FC<MenuOptionsManagementProps> = ({ me
             loadGroups();
         } catch (error) {
             console.error('Failed to delete group:', error);
-            alert('Failed to delete group');
         }
     };
 
@@ -137,7 +135,6 @@ export const MenuOptionsManagement: React.FC<MenuOptionsManagementProps> = ({ me
             loadOptions(selectedGroup.id);
         } catch (error) {
             console.error('Failed to save option:', error);
-            alert('Failed to save option');
         }
     };
 
@@ -158,30 +155,37 @@ export const MenuOptionsManagement: React.FC<MenuOptionsManagementProps> = ({ me
             if (selectedGroup) loadOptions(selectedGroup.id);
         } catch (error) {
             console.error('Failed to delete option:', error);
-            alert('Failed to delete option');
         }
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl border-0">
-                <div className="h-2 bg-gradient-to-r from-purple-500 to-pink-500" />
-                <CardHeader className="flex flex-row items-center justify-between pb-4 border-b">
-                    <div>
-                        <CardTitle className="text-xl">Manage Options: {menuItem.name}</CardTitle>
-                        <CardDescription>Configure sizes, toppings, and extras</CardDescription>
+        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <Card className="w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl border-none animate-in fade-in zoom-in-95 duration-200 bg-white rounded-[2rem] overflow-hidden">
+                {/* Header */}
+                <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 flex-shrink-0">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-orange-500 rounded-2xl shadow-lg shadow-orange-100 text-white">
+                            <Settings2 className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black text-gray-900 tracking-tight">Manage Options</h3>
+                            <p className="text-sm text-gray-500 font-medium mt-0.5">Configuring: <span className="text-orange-600 font-bold">{menuItem.name}</span></p>
+                        </div>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={onClose}>
-                        <X className="h-5 w-5" />
-                    </Button>
-                </CardHeader>
+                    <button
+                        onClick={onClose}
+                        className="p-3 hover:bg-white rounded-2xl transition-all shadow-sm border border-transparent hover:border-gray-100 text-gray-400 hover:text-gray-600"
+                    >
+                        <X className="h-6 w-6" />
+                    </button>
+                </div>
 
                 <div className="flex flex-1 overflow-hidden">
                     {/* Left Sidebar: Groups */}
-                    <div className="w-1/3 border-r bg-gray-50 flex flex-col overflow-y-auto">
-                        <div className="p-4 border-b bg-white sticky top-0 z-10">
+                    <div className="w-80 border-r border-gray-100 bg-gray-50/30 flex flex-col overflow-y-auto">
+                        <div className="p-6 flex-shrink-0">
                             <Button
-                                className="w-full bg-white text-purple-600 border-2 border-purple-100 hover:bg-purple-50 hover:border-purple-200"
+                                className="w-full h-12 bg-white text-orange-600 border-2 border-orange-100 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all font-bold rounded-xl shadow-sm"
                                 onClick={() => {
                                     setEditingGroup(null);
                                     setGroupForm({
@@ -195,117 +199,163 @@ export const MenuOptionsManagement: React.FC<MenuOptionsManagementProps> = ({ me
                                     setShowGroupForm(true);
                                 }}
                             >
-                                <Plus className="h-4 w-4 mr-2" /> Add Group
+                                <Plus className="h-5 w-5 mr-2" /> Add Option Group
                             </Button>
                         </div>
-                        <div className="p-2 space-y-2">
+                        <div className="px-4 pb-6 space-y-3 pb-20">
+                            <div className="px-2 mb-2">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Option Groups</span>
+                            </div>
                             {groups.map(group => (
                                 <div
                                     key={group.id}
                                     onClick={() => setSelectedGroup(group)}
-                                    className={`p-3 rounded-lg cursor-pointer transition-all border ${selectedGroup?.id === group.id
-                                        ? 'bg-purple-50 border-purple-200 shadow-sm'
-                                        : 'bg-white border-transparent hover:bg-gray-100 hover:border-gray-200'
-                                        }`}
+                                    className={`
+                                        p-4 rounded-2xl cursor-pointer transition-all border group
+                                        ${selectedGroup?.id === group.id
+                                            ? 'bg-orange-500 border-orange-500 text-white shadow-xl shadow-orange-100'
+                                            : 'bg-white border-gray-100 text-gray-700 hover:bg-gray-50 hover:border-orange-200 shadow-sm'
+                                        }
+                                    `}
                                 >
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h4 className={`font-semibold ${selectedGroup?.id === group.id ? 'text-purple-700' : 'text-gray-700'}`}>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className="font-bold tracking-tight truncate pr-2">
                                             {group.name}
                                         </h4>
-                                        {selectedGroup?.id === group.id && (
-                                            <div className="flex gap-1">
-                                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); handleEditGroup(group); }}>
-                                                    <Edit className="h-3 w-3" />
-                                                </Button>
-                                                <Button size="icon" variant="ghost" className="h-6 w-6 text-red-500 hover:text-red-600" onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group); }}>
-                                                    <Trash2 className="h-3 w-3" />
-                                                </Button>
-                                            </div>
-                                        )}
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleEditGroup(group); }}
+                                                className={`p-1.5 rounded-lg transition-colors ${selectedGroup?.id === group.id ? 'hover:bg-orange-400' : 'hover:bg-orange-50 text-orange-500'}`}
+                                            >
+                                                <Edit className="h-3 w-3" />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group); }}
+                                                className={`p-1.5 rounded-lg transition-colors ${selectedGroup?.id === group.id ? 'hover:bg-red-400' : 'hover:bg-red-50 text-red-500'}`}
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </button>
+                                        </div>
                                     </div>
-                                    <p className="text-xs text-gray-500 line-clamp-1">{group.description}</p>
-                                    <div className="flex gap-2 mt-2 text-xs text-gray-400">
-                                        <span className="bg-gray-100 px-1.5 py-0.5 rounded">
+                                    <p className={`text-[10px] leading-relaxed line-clamp-2 mb-3 ${selectedGroup?.id === group.id ? 'text-orange-100' : 'text-gray-500'}`}>
+                                        {group.description || 'No description provided.'}
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-widest ${selectedGroup?.id === group.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
                                             {group.isRequired ? 'Required' : 'Optional'}
                                         </span>
-                                        <span>Min: {group.min_selections}</span>
-                                        <span>Max: {group.max_selections}</span>
+                                        <span className={`text-[10px] font-bold ${selectedGroup?.id === group.id ? 'text-orange-100' : 'text-gray-400'}`}>
+                                            {group.min_selections}-{group.max_selections} picks
+                                        </span>
                                     </div>
                                 </div>
                             ))}
                             {groups.length === 0 && (
-                                <div className="text-center py-8 text-gray-400 text-sm px-4">
-                                    No option groups. Click "Add Group" to start (e.g., "Size", "Sauce").
+                                <div className="text-center py-12 px-6">
+                                    <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-300">
+                                        <ListTree className="h-6 w-6" />
+                                    </div>
+                                    <p className="text-xs text-gray-500 font-medium">No groups created yet. Start by adding one!</p>
                                 </div>
                             )}
                         </div>
                     </div>
 
                     {/* Right Content: Options or Forms */}
-                    <div className="flex-1 p-6 overflow-y-auto bg-white">
+                    <div className="flex-1 p-8 overflow-y-auto bg-white custom-scrollbar">
                         {showGroupForm ? (
-                            <div className="max-w-md mx-auto">
-                                <h3 className="text-lg font-bold mb-4">{editingGroup ? 'Edit Group' : 'New Option Group'}</h3>
-                                <form onSubmit={handleGroupSubmit} className="space-y-4">
-                                    <div>
-                                        <label className="text-sm font-medium">Group Name</label>
-                                        <Input
-                                            required
-                                            value={groupForm.name}
-                                            onChange={e => setGroupForm({ ...groupForm, name: e.target.value })}
-                                            placeholder="e.g., Pizza Size"
-                                        />
+                            <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                                <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
+                                    <div className="p-3 bg-gray-900 rounded-2xl text-white">
+                                        <PackagePlus className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <label className="text-sm font-medium">Description</label>
-                                        <Input
-                                            value={groupForm.description || ''}
-                                            onChange={e => setGroupForm({ ...groupForm, description: e.target.value })}
-                                            placeholder="Select one size"
-                                        />
+                                        <h3 className="text-xl font-black text-gray-900">{editingGroup ? 'Update Group' : 'New Option Group'}</h3>
+                                        <p className="text-sm text-gray-500 font-medium">Define selection rules for your customers</p>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="checkbox"
-                                            id="isRequired"
-                                            checked={groupForm.isRequired}
-                                            onChange={e => setGroupForm({ ...groupForm, isRequired: e.target.checked })}
-                                            className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                                        />
-                                        <label htmlFor="isRequired" className="text-sm font-medium">Customer must select at least one?</label>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-sm font-medium">Min Selection</label>
+                                </div>
+
+                                <form onSubmit={handleGroupSubmit} className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2 md:col-span-2">
+                                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Group Label</label>
+                                            <Input
+                                                required
+                                                value={groupForm.name}
+                                                onChange={e => setGroupForm({ ...groupForm, name: e.target.value })}
+                                                placeholder="e.g. Choose your Pizza Size"
+                                                className="h-12 bg-gray-50/50 border-gray-100 rounded-xl font-semibold"
+                                            />
+                                        </div>
+                                        <div className="space-y-2 md:col-span-2">
+                                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Description (Internal or Customer Hint)</label>
+                                            <Input
+                                                value={groupForm.description || ''}
+                                                onChange={e => setGroupForm({ ...groupForm, description: e.target.value })}
+                                                placeholder="e.g. You can select only one size for this pizza"
+                                                className="h-12 bg-gray-50/50 border-gray-100 rounded-xl"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Min. Selections</label>
                                             <Input
                                                 type="number"
                                                 min="0"
                                                 value={groupForm.minSelect}
                                                 onChange={e => setGroupForm({ ...groupForm, minSelect: parseInt(e.target.value) })}
+                                                className="h-12 bg-gray-50/50 border-gray-100 rounded-xl font-bold"
                                             />
                                         </div>
-                                        <div>
-                                            <label className="text-sm font-medium">Max Selection</label>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Max. Selections</label>
                                             <Input
                                                 type="number"
                                                 min="1"
                                                 value={groupForm.maxSelect}
                                                 onChange={e => setGroupForm({ ...groupForm, maxSelect: parseInt(e.target.value) })}
+                                                className="h-12 bg-gray-50/50 border-gray-100 rounded-xl font-bold"
                                             />
                                         </div>
                                     </div>
-                                    <div className="flex gap-2 pt-4">
-                                        <Button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700">Save Group</Button>
-                                        <Button type="button" variant="outline" onClick={() => setShowGroupForm(false)}>Cancel</Button>
+
+                                    <div className="p-4 bg-orange-50/50 border border-orange-100 rounded-2xl">
+                                        <label className="flex items-center gap-3 cursor-pointer group">
+                                            <div className="relative">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={groupForm.isRequired}
+                                                    onChange={e => setGroupForm({ ...groupForm, isRequired: e.target.checked })}
+                                                    className="sr-only"
+                                                />
+                                                <div className={`w-12 h-6 rounded-full transition-colors ${groupForm.isRequired ? 'bg-orange-500' : 'bg-gray-200'}`}></div>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${groupForm.isRequired ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                                            </div>
+                                            <div className="flex-1">
+                                                <span className="text-sm font-bold text-gray-700 group-hover:text-orange-500 transition-colors">Mandatory Selection</span>
+                                                <p className="text-[10px] text-gray-500 font-medium">Customer cannot checkout without selecting an option</p>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div className="flex gap-4 pt-4 border-t border-gray-100">
+                                        <Button type="button" variant="ghost" onClick={() => setShowGroupForm(false)} className="flex-1 h-12 font-bold text-gray-500 rounded-xl">Discard</Button>
+                                        <Button type="submit" className="flex-2 h-12 bg-gray-900 hover:bg-orange-600 text-white font-bold transition-all rounded-xl shadow-lg shadow-gray-200 px-12">
+                                            Save Group Configuration
+                                        </Button>
                                     </div>
                                 </form>
                             </div>
                         ) : selectedGroup ? (
-                            <div>
-                                <div className="flex items-center justify-between mb-6">
-                                    <div>
-                                        <h3 className="text-lg font-bold text-gray-900">{selectedGroup.name} Options</h3>
-                                        <p className="text-sm text-gray-500">Manage choices available in this group</p>
+                            <div className="animate-in fade-in duration-500">
+                                <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl">
+                                            <MousePointerClick className="h-6 w-6" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black text-gray-900 tracking-tight">{selectedGroup.name}</h3>
+                                            <p className="text-sm text-gray-500 font-medium">Available choices within this category</p>
+                                        </div>
                                     </div>
                                     <Button
                                         size="sm"
@@ -314,64 +364,91 @@ export const MenuOptionsManagement: React.FC<MenuOptionsManagementProps> = ({ me
                                             setOptionForm({ name: '', priceAdjustment: 0, groupId: selectedGroup.id });
                                             setShowOptionForm(true);
                                         }}
-                                        className="bg-purple-600 hover:bg-purple-700"
+                                        className="h-11 px-6 bg-gray-900 hover:bg-orange-600 text-white shadow-xl shadow-gray-100 transition-all font-bold rounded-xl"
                                     >
-                                        <Plus className="h-4 w-4 mr-2" /> Add Option
+                                        <Plus className="h-5 w-5 mr-2" /> Add Selection
                                     </Button>
                                 </div>
 
                                 {showOptionForm && (
-                                    <Card className="mb-6 border-purple-100 bg-purple-50">
-                                        <CardContent className="pt-6">
-                                            <form onSubmit={handleOptionSubmit} className="flex gap-4 items-end">
-                                                <div className="flex-1">
-                                                    <label className="text-xs font-medium mb-1 block">Option Name</label>
-                                                    <Input
-                                                        required
-                                                        value={optionForm.name}
-                                                        onChange={e => setOptionForm({ ...optionForm, name: e.target.value })}
-                                                        placeholder="e.g., Extra Cheese"
-                                                        className="bg-white"
-                                                    />
-                                                </div>
-                                                <div className="w-32">
-                                                    <label className="text-xs font-medium mb-1 block">Price (+DZD)</label>
-                                                    <Input
-                                                        type="number"
-                                                        step="0.01"
-                                                        value={optionForm.priceAdjustment}
-                                                        onChange={e => setOptionForm({ ...optionForm, priceAdjustment: parseFloat(e.target.value) })}
-                                                        placeholder="0.00"
-                                                        className="bg-white"
-                                                    />
-                                                </div>
-                                                <Button type="submit" className="bg-purple-600">Save</Button>
-                                                <Button type="button" variant="ghost" onClick={() => setShowOptionForm(false)}>Cancel</Button>
-                                            </form>
-                                        </CardContent>
-                                    </Card>
+                                    <div className="mb-8 p-6 bg-gray-50 border border-gray-100 rounded-3xl animate-in zoom-in-95 duration-200">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h4 className="text-sm font-bold text-gray-900">Add New Option</h4>
+                                            <button onClick={() => setShowOptionForm(false)} className="text-gray-400 hover:text-gray-600"><X className="h-4 w-4" /></button>
+                                        </div>
+                                        <form onSubmit={handleOptionSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="md:col-span-2">
+                                                <Input
+                                                    required
+                                                    value={optionForm.name}
+                                                    onChange={e => setOptionForm({ ...optionForm, name: e.target.value })}
+                                                    placeholder="Option Name (e.g. Extra Cheese)"
+                                                    className="h-12 bg-white border-gray-100 rounded-xl shadow-sm"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Input
+                                                    type="number"
+                                                    step="0.01"
+                                                    value={optionForm.priceAdjustment}
+                                                    onChange={e => setOptionForm({ ...optionForm, priceAdjustment: parseFloat(e.target.value) })}
+                                                    placeholder="Price +DZD"
+                                                    className="h-12 bg-white border-gray-100 rounded-xl shadow-sm font-bold"
+                                                />
+                                            </div>
+                                            <div className="md:col-span-3 flex justify-end gap-3 mt-2">
+                                                <Button type="button" variant="ghost" onClick={() => setShowOptionForm(false)} className="h-10 text-xs font-bold text-gray-500">Cancel</Button>
+                                                <Button type="submit" className="h-10 px-8 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-100 transition-all">
+                                                    Save Option
+                                                </Button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 )}
 
-                                <div className="space-y-2">
+                                <div className="space-y-4">
                                     {options.length === 0 && !showOptionForm ? (
-                                        <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed">
-                                            <p className="text-gray-500">No options in this group yet.</p>
+                                        <div className="py-20 text-center bg-gray-50/50 rounded-[2rem] border-2 border-dashed border-gray-200">
+                                            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-200 shadow-sm">
+                                                <PackagePlus className="h-8 w-8" />
+                                            </div>
+                                            <p className="text-gray-500 font-bold">No options added yet</p>
+                                            <p className="text-xs text-gray-400 mt-1">Start adding choices for your customers to select.</p>
                                         </div>
                                     ) : (
                                         options.map(option => (
-                                            <div key={option.id} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-sm">
-                                                <span className="font-medium text-gray-800">{option.name}</span>
+                                            <div key={option.id} className="group p-5 bg-white border border-gray-100 rounded-2xl flex items-center justify-between hover:border-orange-200 hover:shadow-xl hover:shadow-gray-100 hover:-translate-y-0.5 transition-all duration-300">
                                                 <div className="flex items-center gap-4">
-                                                    <span className={`text-sm font-semibold ${option.priceAdjustment > 0 ? 'text-green-600' : 'text-gray-400'}`}>
-                                                        {option.priceAdjustment > 0 ? `+${option.priceAdjustment.toFixed(2)} DZD` : 'Free'}
-                                                    </span>
-                                                    <div className="flex gap-1">
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-500" onClick={() => handleEditOption(option)}>
+                                                    <div className="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center font-bold text-sm group-hover:bg-orange-50 group-hover:text-orange-500 transition-colors">
+                                                        <Check className="h-5 w-5" />
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-bold text-gray-900 block group-hover:text-orange-600 transition-colors">{option.name}</span>
+                                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{selectedGroup.name} Item</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-6">
+                                                    <div className="text-right">
+                                                        <span className={`text-lg font-black ${option.priceAdjustment > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
+                                                            {option.priceAdjustment > 0 ? `+${option.priceAdjustment.toFixed(2)}` : '0.00'}<small className="text-[10px] ml-1 opacity-50">DZD</small>
+                                                        </span>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Price Adjustment</p>
+                                                    </div>
+
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => handleEditOption(option)}
+                                                            className="p-2.5 bg-gray-50 hover:bg-orange-50 text-gray-400 hover:text-orange-600 rounded-xl transition-all"
+                                                        >
                                                             <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-red-400 hover:text-red-500 hover:bg-red-50" onClick={() => handleDeleteOption(option.id)}>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteOption(option.id)}
+                                                            className="p-2.5 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-600 rounded-xl transition-all"
+                                                        >
                                                             <Trash2 className="h-4 w-4" />
-                                                        </Button>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -380,10 +457,17 @@ export const MenuOptionsManagement: React.FC<MenuOptionsManagementProps> = ({ me
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center h-full text-center text-gray-400">
-                                <Settings2 className="h-16 w-16 mb-4 text-gray-200" />
-                                <p className="text-lg font-medium text-gray-500">Select a group to manage options</p>
-                                <p className="text-sm mt-1">Or create a new group from the left sidebar</p>
+                            <div className="flex flex-col items-center justify-center h-full text-center py-20 animate-in fade-in zoom-in-95 duration-500">
+                                <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mb-8 text-gray-200">
+                                    <ListTree className="h-12 w-12" />
+                                </div>
+                                <h4 className="text-2xl font-black text-gray-900 tracking-tight">Select an Option Category</h4>
+                                <p className="text-gray-500 mt-2 max-w-sm mx-auto font-medium">Please pick a group from the left sidebar to manage available choices or create a new one.</p>
+                                <div className="mt-8 flex gap-3">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl text-orange-600 text-xs font-bold">
+                                        <Info className="h-4 w-4" /> Hot Tip: Required categories help upsells
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -392,3 +476,4 @@ export const MenuOptionsManagement: React.FC<MenuOptionsManagementProps> = ({ me
         </div>
     );
 };
+

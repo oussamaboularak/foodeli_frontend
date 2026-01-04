@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { ordersApi } from '@/api/orders';
 import { usersApi } from '@/api/users';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DashboardLayout from '@/components/DashboardLayout';
-import type { Order, OrderStatus } from '@/types/order';
-import { OrderStatus as OrderStatusEnum } from '@/types/order';
+import { OrderStatus } from '@/types/order';
+import type { Order } from '@/types/order';
 import type { User } from '@/types/user';
 import { Package, MapPin, User as UserIcon, Clock, Trash2, TrendingUp, ChevronRight, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const OrdersPage: React.FC = () => {
-    const navigate = useNavigate();
     const [orders, setOrders] = useState<Order[]>([]);
     const [drivers, setDrivers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
@@ -42,7 +40,7 @@ const OrdersPage: React.FC = () => {
     const handleAssignDriver = async (orderId: string) => {
         if (!selectedDriver) return;
         try {
-            await ordersApi.assignDriver(orderId, { driverId: selectedDriver });
+            await ordersApi.assignDriver(orderId, selectedDriver);
             setSelectedOrder(null);
             setSelectedDriver('');
             loadData();
@@ -53,7 +51,7 @@ const OrdersPage: React.FC = () => {
 
     const handleUpdateStatus = async (orderId: string, status: OrderStatus) => {
         try {
-            await ordersApi.updateStatus(orderId, { status });
+            await ordersApi.updateStatus(orderId, status);
             loadData();
         } catch (error) {
             console.error('Failed to update status:', error);
@@ -72,18 +70,18 @@ const OrdersPage: React.FC = () => {
 
     const getStatusStyles = (status: OrderStatus) => {
         switch (status) {
-            case OrderStatusEnum.COMPLETED:
+            case OrderStatus.COMPLETED:
                 return 'bg-emerald-50 text-emerald-600 border-emerald-100';
-            case OrderStatusEnum.OUT_FOR_DELIVERY:
-            case OrderStatusEnum.READY:
+            case OrderStatus.OUT_FOR_DELIVERY:
+            case OrderStatus.READY:
                 return 'bg-blue-50 text-blue-600 border-blue-100';
-            case OrderStatusEnum.PREPARING:
-            case OrderStatusEnum.ACCEPTED:
+            case OrderStatus.PREPARING:
+            case OrderStatus.ACCEPTED:
                 return 'bg-orange-50 text-orange-600 border-orange-100';
-            case OrderStatusEnum.PENDING:
+            case OrderStatus.PENDING:
                 return 'bg-yellow-50 text-yellow-600 border-yellow-100';
-            case OrderStatusEnum.CANCELLED:
-            case OrderStatusEnum.REJECTED:
+            case OrderStatus.CANCELLED:
+            case OrderStatus.REJECTED:
                 return 'bg-red-50 text-red-600 border-red-100';
             default:
                 return 'bg-gray-50 text-gray-600 border-gray-100';
@@ -92,20 +90,20 @@ const OrdersPage: React.FC = () => {
 
     const getNextStatus = (currentStatus: OrderStatus): OrderStatus | null => {
         const statusFlow: Record<string, OrderStatus | null> = {
-            [OrderStatusEnum.PENDING]: OrderStatusEnum.ACCEPTED,
-            [OrderStatusEnum.ACCEPTED]: OrderStatusEnum.PREPARING,
-            [OrderStatusEnum.PREPARING]: OrderStatusEnum.READY,
-            [OrderStatusEnum.READY]: OrderStatusEnum.OUT_FOR_DELIVERY,
-            [OrderStatusEnum.OUT_FOR_DELIVERY]: OrderStatusEnum.COMPLETED,
+            [OrderStatus.PENDING]: OrderStatus.ACCEPTED,
+            [OrderStatus.ACCEPTED]: OrderStatus.PREPARING,
+            [OrderStatus.PREPARING]: OrderStatus.READY,
+            [OrderStatus.READY]: OrderStatus.OUT_FOR_DELIVERY,
+            [OrderStatus.OUT_FOR_DELIVERY]: OrderStatus.COMPLETED,
         };
         return statusFlow[currentStatus] || null;
     };
 
     const stats = [
         { label: 'Total Orders', value: orders.length, icon: Package, color: 'text-orange-500', bg: 'bg-orange-50' },
-        { label: 'Pending', value: orders.filter(o => o.status === OrderStatusEnum.PENDING).length, icon: AlertCircle, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-        { label: 'In Progress', value: orders.filter(o => [OrderStatusEnum.ACCEPTED, OrderStatusEnum.PREPARING, OrderStatusEnum.READY, OrderStatusEnum.OUT_FOR_DELIVERY].includes(o.status)).length, icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-50' },
-        { label: 'Completed', value: orders.filter(o => o.status === OrderStatusEnum.COMPLETED).length, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+        { label: 'Pending', value: orders.filter(o => o.status === OrderStatus.PENDING).length, icon: AlertCircle, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+        { label: 'In Progress', value: orders.filter(o => (['ACCEPTED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY'] as string[]).includes(o.status)).length, icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-50' },
+        { label: 'Completed', value: orders.filter(o => o.status === OrderStatus.COMPLETED).length, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50' },
     ];
 
     return (
@@ -211,8 +209,8 @@ const OrdersPage: React.FC = () => {
                                                                 {drivers.map(d => <option key={d.id} value={d.id}>{d.firstName} {d.lastName}</option>)}
                                                             </select>
                                                             <div className="flex gap-2">
-                                                                <Button size="xs" className="flex-1 bg-orange-500 hover:bg-orange-600 text-white" onClick={() => handleAssignDriver(order.id)}>Assign</Button>
-                                                                <Button size="xs" variant="outline" className="flex-1" onClick={() => setSelectedOrder(null)}>X</Button>
+                                                                <Button size="sm" className="flex-1 bg-orange-500 hover:bg-orange-600 text-white" onClick={() => handleAssignDriver(order.id)}>Assign</Button>
+                                                                <Button size="sm" variant="outline" className="flex-1" onClick={() => setSelectedOrder(null)}>X</Button>
                                                             </div>
                                                         </div>
                                                     ) : (

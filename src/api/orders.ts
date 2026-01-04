@@ -2,8 +2,6 @@ import apiClient from './client';
 import type {
     Order,
     CreateOrderPayload,
-    AssignDriverPayload,
-    UpdateOrderStatusPayload,
 } from '@/types/order';
 
 interface ApiResponse<T> {

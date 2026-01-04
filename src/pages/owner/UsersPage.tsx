@@ -14,7 +14,13 @@ const UsersPage: React.FC = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        firstName: string;
+        lastName: string;
+        phone: string;
+        password: string;
+        role: UserRole;
+    }>({
         firstName: '',
         lastName: '',
         phone: '',
@@ -123,7 +129,7 @@ const UsersPage: React.FC = () => {
         { label: 'Total Users', value: users.length, icon: UsersIcon, color: 'text-gray-900', bg: 'bg-gray-100' },
         { label: 'Clients', value: users.filter(u => u.role === 'CLIENT').length, icon: UserCircle, color: 'text-emerald-500', bg: 'bg-emerald-50' },
         { label: 'Drivers', value: users.filter(u => u.role === 'DRIVER').length, icon: Shield, color: 'text-blue-500', bg: 'bg-blue-50' },
-        { label: 'Admin/Staff', value: users.filter(u => ['OWNER', 'RESTAURANT'].includes(u.role)).length, icon: Shield, color: 'text-orange-500', bg: 'bg-orange-50' },
+        { label: 'Admin/Staff', value: users.filter(u => (['OWNER', 'RESTAURANT'] as string[]).includes(u.role)).length, icon: Shield, color: 'text-orange-500', bg: 'bg-orange-50' },
     ];
 
     return (

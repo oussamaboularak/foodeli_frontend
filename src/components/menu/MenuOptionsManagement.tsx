@@ -4,7 +4,7 @@ import type { MenuItem, MenuOptionGroup, MenuOption, MenuOptionGroupFormData, Me
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Plus, X, Trash2, Edit, Check, ChevronRight, Settings2, Info, ListTree, PackagePlus, MousePointerClick } from 'lucide-react';
+import { Plus, X, Trash2, Edit, Check, Settings2, Info, ListTree, PackagePlus, MousePointerClick } from 'lucide-react';
 
 interface MenuOptionsManagementProps {
     menuItem: MenuItem;
@@ -15,7 +15,6 @@ export const MenuOptionsManagement: React.FC<MenuOptionsManagementProps> = ({ me
     const [groups, setGroups] = useState<MenuOptionGroup[]>([]);
     const [selectedGroup, setSelectedGroup] = useState<MenuOptionGroup | null>(null);
     const [options, setOptions] = useState<MenuOption[]>([]);
-    const [loading, setLoading] = useState(false);
 
     // Form States
     const [showGroupForm, setShowGroupForm] = useState(false);

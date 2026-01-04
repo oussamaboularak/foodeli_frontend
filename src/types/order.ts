@@ -1,13 +1,15 @@
-export enum OrderStatus {
-    PENDING = 'PENDING',
-    ACCEPTED = 'ACCEPTED',
-    PREPARING = 'PREPARING',
-    READY = 'READY',
-    OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',
-    COMPLETED = 'COMPLETED',
-    CANCELLED = 'CANCELLED',
-    REJECTED = 'REJECTED',
-}
+export const OrderStatus = {
+    PENDING: 'PENDING',
+    ACCEPTED: 'ACCEPTED',
+    PREPARING: 'PREPARING',
+    READY: 'READY',
+    OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
+    COMPLETED: 'COMPLETED',
+    CANCELLED: 'CANCELLED',
+    REJECTED: 'REJECTED',
+} as const;
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
 export interface OrderItem {
     menuItemId: string;

@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { authApi } from '@/api/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Store, User, Lock, Phone, Star, UtensilsCrossed } from 'lucide-react';
+import { Star, UtensilsCrossed } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);

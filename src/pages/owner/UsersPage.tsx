@@ -178,56 +178,86 @@ const UsersPage: React.FC = () => {
                     />
                 </div>
 
-                {/* Users List */}
-                <div className="space-y-4">
+                {/* Users Data Grid */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     {loading ? (
                         <div className="py-20 text-center text-gray-400 italic">Fetching users...</div>
                     ) : filteredUsers.length === 0 ? (
-                        <Card className="border-none bg-gray-50/50">
-                            <CardContent className="py-20 text-center">
-                                <UsersIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                                <p className="text-gray-500 font-medium">No users found matching your search</p>
-                            </CardContent>
-                        </Card>
+                        <div className="py-20 text-center">
+                            <UsersIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                            <p className="text-gray-500 font-medium">No users found matching your search</p>
+                        </div>
                     ) : (
-                        filteredUsers.map((user) => (
-                            <Card key={user.id} className="border-none shadow-sm hover:shadow-lg transition-all duration-200 group overflow-hidden bg-white">
-                                <div className={`h-1 w-full flex-shrink-0 ${user.role === 'OWNER' ? 'bg-purple-400' : 'bg-orange-400'}`} />
-                                <div className="flex items-center p-6">
-                                    {/* Avatar */}
-                                    <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-orange-50 group-hover:text-orange-500 transition-colors flex-shrink-0">
-                                        <UserCircle className="h-10 w-10" />
-                                    </div>
-
-                                    {/* User Info */}
-                                    <div className="flex-1 ml-6">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h4 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                                {user.firstName} {user.lastName}
-                                                {user.role === 'OWNER' && <Shield className="h-4 w-4 text-purple-500" />}
-                                            </h4>
-                                            <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getRoleStyles(user.role)}`}>
-                                                {user.role}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                                            <Phone className="h-4 w-4" />
-                                            {user.phone}
-                                        </div>
-                                    </div>
-
-                                    {/* Actions */}
-                                    <div className="flex gap-2 ml-4">
-                                        <Button variant="outline" size="sm" className="h-9 px-4 rounded-lg hover:bg-orange-50 hover:text-orange-600 hover:border-orange-100" onClick={() => handleEdit(user)}>
-                                            <Edit className="h-4 w-4 mr-1.5" /> Edit
-                                        </Button>
-                                        <Button variant="outline" size="sm" className="h-9 w-9 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-100 p-0" onClick={() => handleDelete(user.id)}>
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </Card>
-                        ))
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            User
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Phone
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Role
+                                        </th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredUsers.map((user) => (
+                                        <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <div className="h-10 w-10 flex-shrink-0">
+                                                        <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                                                            <UserCircle className="h-6 w-6 text-gray-400" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="ml-4">
+                                                        <div className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                                            {user.firstName} {user.lastName}
+                                                            {user.role === 'OWNER' && <Shield className="h-3 w-3 text-purple-500" />}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center text-sm text-gray-900">
+                                                    <Phone className="h-4 w-4 text-orange-500 mr-2" />
+                                                    {user.phone}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${getRoleStyles(user.role)}`}>
+                                                    {user.role}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <div className="flex justify-end gap-2">
+                                                    <button
+                                                        onClick={() => handleEdit(user)}
+                                                        className="p-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 rounded-lg transition-colors"
+                                                        title="Edit"
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(user.id)}
+                                                        className="p-2 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </div>
             </div>

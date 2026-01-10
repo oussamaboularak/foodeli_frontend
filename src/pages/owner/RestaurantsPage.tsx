@@ -233,85 +233,108 @@ const RestaurantsPage: React.FC = () => {
                     </Card>
                 )}
 
-                {/* Vertical List */}
-                <div className="space-y-4">
+                {/* Data Grid */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     {loading ? (
                         <div className="py-12 text-center text-gray-500">Loading restaurants...</div>
                     ) : filteredRestaurants.length === 0 ? (
-                        <div className="py-12 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                        <div className="py-12 text-center bg-gray-50">
                             <Store className="h-10 w-10 text-gray-300 mx-auto mb-3" />
                             <p className="text-gray-500 font-medium">No restaurants found</p>
                         </div>
                     ) : (
-                        filteredRestaurants.map((restaurant) => (
-                            <Card
-                                key={restaurant.id}
-                                className="group overflow-hidden border-none shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer bg-white"
-                                onClick={() => navigate(`/restaurants/${restaurant.id}`)}
-                            >
-                                <div className="flex flex-col md:flex-row">
-                                    {/* Image Section */}
-                                    <div className="relative md:w-64 h-48 md:h-auto bg-gray-100 overflow-hidden flex-shrink-0">
-                                        {restaurant.coverUrl ? (
-                                            <img
-                                                src={restaurant.coverUrl}
-                                                alt={restaurant.name}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-orange-50 text-orange-200">
-                                                <Store className="h-16 w-16" />
-                                            </div>
-                                        )}
-                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                                    </div>
-
-                                    {/* Content Section */}
-                                    <div className="flex-1 p-6">
-                                        <div className="flex items-start justify-between mb-3">
-                                            <div className="flex-1">
-                                                <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors mb-2">
-                                                    {restaurant.name}
-                                                </h3>
-                                                <p className="text-sm text-gray-500 line-clamp-2 mb-4">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Restaurant
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Description
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Phone
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Location
+                                        </th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredRestaurants.map((restaurant) => (
+                                        <tr
+                                            key={restaurant.id}
+                                            className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                            onClick={() => navigate(`/restaurants/${restaurant.id}`)}
+                                        >
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <div className="h-10 w-10 flex-shrink-0">
+                                                        {restaurant.coverUrl ? (
+                                                            <img
+                                                                src={restaurant.coverUrl}
+                                                                alt={restaurant.name}
+                                                                className="h-10 w-10 rounded-lg object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="h-10 w-10 rounded-lg bg-orange-50 flex items-center justify-center">
+                                                                <Store className="h-5 w-5 text-orange-400" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="ml-4">
+                                                        <div className="text-sm font-medium text-gray-900">
+                                                            {restaurant.name}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-500 max-w-xs truncate">
                                                     {restaurant.description}
-                                                </p>
-                                            </div>
-
-                                            {/* Quick Actions */}
-                                            <div className="flex gap-2 ml-4">
-                                                <button
-                                                    onClick={(e) => handleEdit(restaurant, e)}
-                                                    className="p-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 rounded-lg transition-colors"
-                                                >
-                                                    <Edit className="h-4 w-4" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleDelete(restaurant.id, e)}
-                                                    className="p-2 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg transition-colors"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Details */}
-                                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                                            <div className="flex items-center gap-2">
-                                                <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                                <span className="truncate">
-                                                    {restaurant.location.coordinates[1].toFixed(4)}, {restaurant.location.coordinates[0].toFixed(4)}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Phone className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                                <span>{restaurant.phone}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card>
-                        ))
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center text-sm text-gray-900">
+                                                    <Phone className="h-4 w-4 text-orange-500 mr-2" />
+                                                    {restaurant.phone}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center text-sm text-gray-500">
+                                                    <MapPin className="h-4 w-4 text-orange-500 mr-2 flex-shrink-0" />
+                                                    <span className="truncate max-w-[150px]">
+                                                        {restaurant.location.coordinates[1].toFixed(4)}, {restaurant.location.coordinates[0].toFixed(4)}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <div className="flex justify-end gap-2">
+                                                    <button
+                                                        onClick={(e) => handleEdit(restaurant, e)}
+                                                        className="p-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 rounded-lg transition-colors"
+                                                        title="Edit"
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => handleDelete(restaurant.id, e)}
+                                                        className="p-2 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </div>
             </div>

@@ -10,7 +10,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { MenuOptionsManagement } from '@/components/menu/MenuOptionsManagement';
 import type { Restaurant } from '@/types/restaurant';
 import type { MenuItem } from '@/types/menu';
-import { ArrowLeft, Plus, X, Trash2, UtensilsCrossed, Tag, Edit, Settings, Eye, MapPin, Phone, Image as ImageIcon, ExternalLink, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, X, Trash2, UtensilsCrossed, Tag, Edit, Settings, Eye, MapPin, Phone, Image as ImageIcon, ExternalLink } from 'lucide-react';
 
 const RestaurantDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -28,6 +28,7 @@ const RestaurantDetailPage: React.FC = () => {
         category: '',
     });
     const [itemImage, setItemImage] = useState<File | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
     useEffect(() => {
         if (id) {
@@ -117,7 +118,15 @@ const RestaurantDetailPage: React.FC = () => {
         }
     };
 
-    const groupedMenuItems = menuItems.reduce((acc, item) => {
+    // Get all unique categories
+    const allCategories = Array.from(new Set(menuItems.map(item => item.category || 'Uncategorized')));
+
+    // Filter menu items by selected category
+    const filteredMenuItems = selectedCategory === 'all'
+        ? menuItems
+        : menuItems.filter(item => (item.category || 'Uncategorized') === selectedCategory);
+
+    const groupedMenuItems = filteredMenuItems.reduce((acc, item) => {
         const category = item.category || 'Uncategorized';
         if (!acc[category]) {
             acc[category] = [];
@@ -247,8 +256,36 @@ const RestaurantDetailPage: React.FC = () => {
                     </span>
                 </div>
 
-                {/* Menu Items List */}
-                <div className="space-y-12 pb-20">
+                {/* Category Filter */}
+                {menuItems.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-6">
+                        <button
+                            onClick={() => setSelectedCategory('all')}
+                            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${selectedCategory === 'all'
+                                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-100'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:border-orange-300 hover:text-orange-600'
+                                }`}
+                        >
+                            All Categories
+                        </button>
+                        {allCategories.map((category) => (
+                            <button
+                                key={category}
+                                onClick={() => setSelectedCategory(category)}
+                                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${selectedCategory === category
+                                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-100'
+                                        : 'bg-white text-gray-600 border border-gray-200 hover:border-orange-300 hover:text-orange-600'
+                                    }`}
+                            >
+                                {category}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+
+                {/* Menu Items Data Grid */}
+                <div className="space-y-8 pb-20">
                     {Object.keys(groupedMenuItems).length === 0 ? (
                         <Card className="border-none bg-gray-50/50 rounded-[2rem]">
                             <CardContent className="py-24 text-center">
@@ -267,7 +304,7 @@ const RestaurantDetailPage: React.FC = () => {
                         </Card>
                     ) : (
                         Object.entries(groupedMenuItems).map(([category, items]) => (
-                            <div key={category} className="space-y-6">
+                            <div key={category} className="space-y-4">
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-100 rounded-2xl shadow-sm">
                                         <Tag className="h-5 w-5 text-orange-500" />
@@ -276,90 +313,104 @@ const RestaurantDetailPage: React.FC = () => {
                                     <div className="h-px flex-1 bg-gray-100 opacity-50"></div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    {items.map((item) => (
-                                        <Card key={item.id} className="border-none shadow-sm hover:shadow-xl transition-all duration-500 group overflow-hidden bg-white rounded-3xl">
-                                            <div className="flex flex-col md:flex-row">
-                                                {/* Image Section */}
-                                                <div className="relative md:w-80 h-60 md:h-auto overflow-hidden bg-gray-50 flex-shrink-0">
-                                                    {item.image_url ? (
-                                                        <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-200">
-                                                            <ImageIcon className="h-16 w-16 mb-2" />
-                                                            <span className="text-[10px] font-black uppercase tracking-widest opacity-50">No Menu Image</span>
-                                                        </div>
-                                                    )}
-                                                    <div className="absolute top-5 left-5">
-                                                        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg ${item.is_active ? 'bg-emerald-500/90 text-white' : 'bg-gray-400/90 text-white'}`}>
-                                                            {item.is_active ? 'Active' : 'Draft'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Content Section */}
-                                                <div className="flex-1 p-8">
-                                                    <div className="flex flex-col h-full">
-                                                        <div className="flex items-start justify-between mb-4">
-                                                            <div className="flex-1 mr-6">
-                                                                <h5 className="text-2xl font-black text-gray-900 group-hover:text-orange-500 transition-colors mb-2">
-                                                                    {item.name}
-                                                                </h5>
-                                                                <p className="text-gray-500 text-sm leading-relaxed font-medium line-clamp-2">
-                                                                    {item.description || "No description provided for this delicious item."}
-                                                                </p>
+                                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full">
+                                            <thead className="bg-gray-50 border-b border-gray-200">
+                                                <tr>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Item
+                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Description
+                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Price
+                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Status
+                                                    </th>
+                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Actions
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white divide-y divide-gray-200">
+                                                {items.map((item) => (
+                                                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="flex items-center">
+                                                                <div className="h-12 w-12 flex-shrink-0">
+                                                                    {item.image_url ? (
+                                                                        <img
+                                                                            src={item.image_url}
+                                                                            alt={item.name}
+                                                                            className="h-12 w-12 rounded-lg object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="h-12 w-12 rounded-lg bg-orange-50 flex items-center justify-center">
+                                                                            <ImageIcon className="h-6 w-6 text-orange-400" />
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                <div className="ml-4">
+                                                                    <div className="text-sm font-bold text-gray-900">
+                                                                        {item.name}
+                                                                    </div>
+                                                                    <div className="text-xs text-gray-500">
+                                                                        {item.category}
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div className="text-right">
-                                                                <span className="text-3xl font-black text-orange-600 block">
-                                                                    {item.price.toFixed(2)}<small className="text-xs ml-1 opacity-50">DZD</small>
-                                                                </span>
-                                                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Base Price</span>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="text-sm text-gray-500 max-w-md truncate">
+                                                                {item.description || "No description"}
                                                             </div>
-                                                        </div>
-
-                                                        <div className="mt-auto pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-50">
-                                                            <div className="flex items-center gap-6">
-                                                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
-                                                                    {item.category}
-                                                                </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="text-sm font-bold text-orange-600">
+                                                                {item.price.toFixed(2)} DZD
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${item.is_active
+                                                                ? 'bg-green-100 text-green-800'
+                                                                : 'bg-gray-100 text-gray-800'
+                                                                }`}>
+                                                                {item.is_active ? 'Active' : 'Draft'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                            <div className="flex justify-end gap-2">
                                                                 <button
                                                                     onClick={() => setItemForOptions(item)}
-                                                                    className="text-xs font-black text-orange-600 flex items-center gap-1.5 hover:text-orange-700 transition-colors group/link"
-                                                                >
-                                                                    Manage Selection Options
-                                                                    <ChevronRight className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
-                                                                </button>
-                                                            </div>
-
-                                                            <div className="flex gap-2">
-                                                                <button
-                                                                    onClick={() => setItemForOptions(item)}
-                                                                    className="p-3 bg-gray-50 hover:bg-orange-600 text-gray-400 hover:text-white rounded-2xl transition-all shadow-sm"
+                                                                    className="p-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 rounded-lg transition-colors"
                                                                     title="Configure Options"
                                                                 >
-                                                                    <Settings className="h-5 w-5" />
+                                                                    <Settings className="h-4 w-4" />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleEdit(item)}
-                                                                    className="p-3 bg-gray-50 hover:bg-orange-600 text-gray-400 hover:text-white rounded-2xl transition-all shadow-sm"
-                                                                    title="Edit Details"
+                                                                    className="p-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 rounded-lg transition-colors"
+                                                                    title="Edit"
                                                                 >
-                                                                    <Edit className="h-5 w-5" />
+                                                                    <Edit className="h-4 w-4" />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDelete(item.id)}
-                                                                    className="p-3 bg-gray-50 hover:bg-red-600 text-gray-400 hover:text-white rounded-2xl transition-all shadow-sm"
-                                                                    title="Remove Item"
+                                                                    className="p-2 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg transition-colors"
+                                                                    title="Delete"
                                                                 >
-                                                                    <Trash2 className="h-5 w-5" />
+                                                                    <Trash2 className="h-4 w-4" />
                                                                 </button>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Card>
-                                    ))}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         ))
